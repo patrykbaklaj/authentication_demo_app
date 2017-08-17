@@ -63,11 +63,25 @@ app.post("/login", passport.authenticate("local" , {
 
 });
 
+// Logout
+app.get("/logout", function(req, res){
+  req.logout();
+  res.redirect("/");
+});
+
+// check if user is logged in
+function isLoggedIn(req, res, next){
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/login");
+}
+
 app.get("/", function(req, res){
   res.render("home");
 });
 
-app.get("/secret", function(req, res){
+app.get("/secret", isLoggedIn, function(req, res){
     res.render("secret");
 });
 
