@@ -13,6 +13,7 @@ mongoose.connect("mongodb://localhost/auth_demo_app");
 var app = express();
 app.set("view engine", "ejs");
 
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(require("express-session")({
   secret: "My name is Patryk",
   resave: false,
@@ -23,6 +24,29 @@ app.use(passport.session());
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+
+// ==================
+// Routes
+// ==================
+
+// REGISTER
+// shows sign up form
+app.get("/register", function (req, res){
+  res.render("register");
+});
+// handling User Sing Up
+app.post("/register", function(req, res){
+  User.register(new User({username: req.body.username}), req.body.password, function(err, user){
+    if (err) {
+      console.log(err);
+      return res.render("register");
+    }
+    passport.authenticate("local")(req, res, function(){
+      res.redirect("/secret");
+    });
+  });
+});
 
 app.get("/", function(req, res){
   res.render("home");
